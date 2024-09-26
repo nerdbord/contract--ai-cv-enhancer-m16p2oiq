@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { LoaderFunction, redirect, ActionFunction } from "@remix-run/node";
 import { getAuth } from "@clerk/remix/ssr.server";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { saveCV, cvToJSON } from "actions/cv";
 import { getUserByClerkId } from "actions/user";
 import { prisma } from "lib/prisma";
@@ -57,10 +58,7 @@ export const action: ActionFunction = async ({ request }) => {
       extractedCV: extractedCV,
     });
 
-    return {
-      message: `File ${file.name} uploaded and saved to database successfully.`,
-      cvId: savedCV.id,
-    };
+    return { cvId: savedCV.id };
   } catch (error) {
     return { message: `Failed to upload file`, error };
   }
