@@ -39,10 +39,11 @@ export const cvToJSON = async (buffer: Buffer) => {
       schema: CVSchema,
       prompt: "Extract the text from the attached CV." + buffer.toString(),
     });
+    console.log("Extracted text:", result.object);
     return result.object;
   } catch (error) {
-    console.error("Błąd podczas ekstrakcji tekstu z CV:", error);
-    throw new Error("Nie udało się wyekstrahować tekstu z dostarczonego CV.");
+    console.error("Error extracting text:", error);
+    throw new Error("Extracting text from CV failed.");
   }
 };
 
@@ -82,10 +83,35 @@ export async function saveCV({
       },
     });
 
-    console.log("successfully saved CV");
+    //console.log("successfully saved CV");
     return savedCV;
   } catch (error) {
-    console.error("Error saving CV:", error);
+    //console.error("Error saving CV:", error);
     throw new Error(`Failed to save CV - ${error}`);
+  }
+}
+
+export async function getCV(userId: string) {
+  try {
+    const cv = await prisma.cV.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!cv || !cv.extractedCV) {
+      throw new Error("CV not found or extracted data is missing");
+    }
+
+    console.log("Retrieved CV:", cv.extractedCV);
+
+    const parsedCV = CVSchema.safeParse(cv.extractedCV);
+    if (!parsedCV.success) {
+      throw new Error("Extracted CV data does not match the expected format");
+    }
+
+    return parsedCV.data;
+  } catch (error) {
+    throw new Error(`Failed to get CV - ${error}`);
   }
 }

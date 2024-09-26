@@ -66,7 +66,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 };
 
-export default function DashboardRoute() {
+export default function UploadCVRoute() {
   const actionData = useActionData<{
     message: string;
     structuredData?: Record<string, unknown>;
