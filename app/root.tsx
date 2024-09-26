@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import "./tailwind.css";
 import {
   Links,
@@ -17,7 +18,7 @@ import { rootAuthLoader } from "@clerk/remix/ssr.server";
 export const loader: LoaderFunction = (args) => {
   return rootAuthLoader(args, ({ request }) => {
     const { sessionId, userId, getToken } = request.auth;
-    console.log(sessionId, userId, getToken);
+    //console.log(sessionId, userId, getToken);
     return { yourData: "here" };
   });
 };

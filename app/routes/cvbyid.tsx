@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { LoaderFunction, redirect } from "@remix-run/node";
 import { getAuth } from "@clerk/remix/ssr.server";
 import { useLoaderData } from "@remix-run/react";
 import { getUserByClerkId } from "actions/user";
-import { getCV } from "actions/cv";
+import { getCVById } from "actions/cv";
 
 export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args);
@@ -15,7 +14,7 @@ export const loader: LoaderFunction = async (args) => {
   if (!userDBId) return redirect("/sign-in");
 
   try {
-    const CV = await getCV(userDBId);
+    const CV = await getCVById(4);
 
     if (!CV) {
       return {
@@ -44,6 +43,7 @@ export default function CVRoute() {
   const loaderData = useLoaderData<{
     userDBId: string;
     message: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     structuredData?: any; // Changed to accept any type of data
   }>();
 
