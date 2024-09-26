@@ -26,24 +26,6 @@ export default function DashboardRoute() {
   return (
     <main className="flex flex-col h-screen items-center justify-start gap-16 p-4">
       <h1 className="text-3xl font-bold">Dashboard</h1>
-      <div className="flex  gap-4">
-        <Link to="/upload">
-          <button
-            type="submit"
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-          >
-            Upload and Enhance CV
-          </button>
-        </Link>
-        <Link to="/cv">
-          <button
-            type="submit"
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-          >
-            View your CV
-          </button>
-        </Link>
-      </div>
     </main>
   );
 }

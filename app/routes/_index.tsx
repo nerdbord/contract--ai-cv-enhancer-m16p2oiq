@@ -30,7 +30,6 @@ export const meta: MetaFunction = () => {
 
 export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args);
-  //console.log("userId", userId);
   if (userId) {
     await createUserFromClerk(userId);
   }

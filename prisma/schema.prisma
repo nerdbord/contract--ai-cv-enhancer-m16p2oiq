@@ -23,11 +23,13 @@ model User {
 
 model CV {
   id        Int       @id @default(sequence())
-  cv        Bytes     // Pole do przechowywania pliku PDF
-  name      String    // Nadana przez usera nazwa pliku
-  fileName  String   
+  name      String   
+  fileName  String  
+  cv        Bytes     
   mimeType  String   
+  cvHash      String   @unique
+  extractedCV  Json  
   createdAt DateTime  @default(now())
-  userId    String    // Klucz obcy do modelu User
+  userId    String    
   user      User      @relation(fields: [userId], references: [id])
 }
