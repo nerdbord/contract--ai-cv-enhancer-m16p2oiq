@@ -1,15 +1,10 @@
 import { MetaFunction, LoaderFunction } from "@remix-run/node";
 import { getAuth } from "@clerk/remix/ssr.server";
-import { Link } from "@remix-run/react";
 import { createUserFromClerk } from "actions/user";
-import {
-  SignInButton,
-  SignOutButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/remix";
+import { Landing } from "~/components/ui/Landing";
+import DashboardRoute from "./dashboard";
+import { useLoaderData } from "@remix-run/react";
+import { MainNavigation } from "~/components/ui/MainNavigation";
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,42 +33,15 @@ export const loader: LoaderFunction = async (args) => {
 };
 
 export default function Index() {
+  const {
+    data: { userId },
+  } = useLoaderData<{ data: { userId: string | null } }>();
   return (
-    <main className="flex flex-col h-screen items-center justify-start gap-16 p-4">
-      <div>
-        <div className="flex gap-4">
-          {" "}
-          <SignedIn>
-            <p>You are signed in!</p>
-            <div>
-              <UserButton />
-            </div>
-            <div>
-              <SignOutButton />
-            </div>
-          </SignedIn>
-          <SignedOut>
-            <p>You are signed out</p>
-            <div>
-              <SignInButton />
-            </div>
-            <div>
-              <SignUpButton />
-            </div>
-          </SignedOut>
-          <Link to="/dashboard">
-            <button
-              type="submit"
-              className="mt-4 p-2 bg-blue-500 text-white rounded"
-            >
-              dashboard
-            </button>
-          </Link>
-        </div>
+    <main className="flex flex-col items-center justify-start w-full flex-grow pt-20">
+      <MainNavigation />
+      <div className="flex flex-grow w-full">
+        {userId ? <DashboardRoute /> : <Landing />}
       </div>
-      LANDING
     </main>
   );
 }
-
-//const resources = [];

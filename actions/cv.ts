@@ -59,7 +59,7 @@ export const cvToJSON = async (buffer: Buffer) => {
       model: openai("gpt-4o"),
       schema: CVSchema,
       prompt:
-        "analyze and extract data from the CV attached to the prompt. Complete the data according to the CVSchema schema. If the schema does not contain fields that appear in the CV, create a new field in the object." +
+        "analyze and extract data from the CV attached to the prompt. Complete the data according to the CVSchema schema. If the schema does not contain fields that appear in the CV, create a new field in the returned object." +
         buffer.toString(),
     });
     console.log("Extracted text:", result.object);
