@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 export const Testimony = () => {
   return (
-    <div className="py-8 bg-white flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-bold text-center mb-6">
+    <div className="py-14 bg-slate-100 flex flex-col items-center justify-center">
+      <h2 className="text-center text-4xl not-italic font-normal leading-10 mb-9">
         Trusted by over 30k jobseekers around the world
       </h2>
       <div className="flex gap-6">

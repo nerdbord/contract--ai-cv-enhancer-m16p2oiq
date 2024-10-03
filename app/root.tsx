@@ -54,8 +54,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="flex flex-col min-h-screen h-full">
-        <div className="flex flex-col w-full flex-grow max-w-screen-xl mx-auto relative">
-          <div className="flex-grow bg-gray-300">{children}</div>
+        <div className="flex flex-col w-full flex-grow max-w-screen-2xl mx-auto relative">
+          <div className="flex-grow bg-gray-300 w-full">{children}</div>
           <Footer />
         </div>
         <ScrollRestoration />

@@ -1,8 +1,8 @@
-import { MetaFunction, LoaderFunction } from "@remix-run/node";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { MetaFunction, LoaderFunction, redirect } from "@remix-run/node";
 import { getAuth } from "@clerk/remix/ssr.server";
 import { createUserFromClerk } from "actions/user";
 import { Landing } from "~/components/ui/Landing";
-import DashboardRoute from "./dashboard";
 import { useLoaderData } from "@remix-run/react";
 import { MainNavigation } from "~/components/ui/MainNavigation";
 
@@ -36,11 +36,12 @@ export default function Index() {
   const {
     data: { userId },
   } = useLoaderData<{ data: { userId: string | null } }>();
+
   return (
     <main className="flex flex-col items-center justify-start w-full flex-grow pt-20">
       <MainNavigation />
       <div className="flex flex-grow w-full">
-        {userId ? <DashboardRoute /> : <Landing />}
+        <Landing />
       </div>
     </main>
   );
