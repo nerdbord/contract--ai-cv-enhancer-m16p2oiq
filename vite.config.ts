@@ -5,9 +5,16 @@ import { netlifyPlugin } from "@netlify/remix-adapter/plugin";
 
 export default defineConfig({
   plugins: [remix(), netlifyPlugin(), tsconfigPaths()],
-  build: {
+  /* build: {
     rollupOptions: {
-      external: ["@clerk/remix", "react-icons/go"],
+      external: [
+        "@clerk/remix",
+        "react-icons/go",
+        "react-icons/cg",
+        "react-icons/tfi",
+        "react-icons/bs",
+        "react-icons/fa",
+      ],
     },
-  },
+  }, */
 });
