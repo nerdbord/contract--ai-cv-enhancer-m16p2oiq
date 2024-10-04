@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [remix(), netlifyPlugin(), tsconfigPaths()],
   build: {
     rollupOptions: {
-      external: ["@clerk/remix"],
+      external: ["@clerk/remix", "react-icons/go"],
     },
   },
 });
