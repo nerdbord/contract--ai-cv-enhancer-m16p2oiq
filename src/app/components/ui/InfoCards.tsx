@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export const InfoCards = () => {
   return (
-    <div className="flex flex-col gap-9 items-center p-4 bg-slate-100 px-60 py-14">
+    <div className="flex flex-col gap-9 items-center p-4 bg-white px-60 py-14">
       <div className="flex gap-5 items-center">
         <Image src={heroimg} alt="card img" className="w-auto h-[200px]" />
         <div className="p-6 ">

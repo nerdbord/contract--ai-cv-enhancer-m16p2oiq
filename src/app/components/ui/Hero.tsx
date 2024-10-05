@@ -2,25 +2,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { HeroImg } from "@/assets/HeroImg";
+import { Head, Lightning, Flower } from "@/assets/TestimonyIcons";
 
 const benefitsData = [
   {
     title: "Personalized for You",
     description:
       "AI analyzes your skills and experience to create a resume that aligns with your career goals.",
-    icon: "👤",
+    icon: <Head />,
   },
   {
     title: "Fast and Efficient",
     description:
       "Save time by letting our technology do the heavy lifting, delivering a polished CV in minutes.",
-    icon: "⚡",
+    icon: <Lightning />,
   },
   {
     title: "Optimized for Success",
     description:
       "Increase your chances of standing out with a resume to meet the requirements of your job.",
-    icon: "✨",
+    icon: <Flower />,
   },
 ];
 
@@ -64,12 +65,15 @@ export const Hero = () => {
             {benefitsData.map((benefit, index) => (
               <div
                 key={index}
-                className="text-start flex gap-2 p-2.5 w-[300px]"
+                className="text-start flex gap-2 p-2.5 w-[250px]"
               >
-                <div className="w-16 h-16 rounded-full bg-teal-400 text-black flex items-center justify-center mx-auto mb-4 text-2xl not-italic font-normal leading-10 text-base-neutral">
-                  {benefit.icon}
+                <div className="w-1/4">
+                  <div className="w-10 h-10 rounded-full bg-teal-400 text-black flex items-center justify-center mx-auto mb-4 text-2xl not-italic font-normal leading-10 text-base-neutral ">
+                    {benefit.icon}
+                  </div>
                 </div>
-                <div className="">
+
+                <div className="w-3/4">
                   <h3 className="text-base not-italic font-semibold leading-6 mb-2">
                     {benefit.title}
                   </h3>
