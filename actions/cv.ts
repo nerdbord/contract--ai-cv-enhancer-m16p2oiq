@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { z } from "zod";
-import { prisma } from "lib/prisma";
-import { openai } from "lib/openai";
+import { prisma } from "../src/lib/prisma";
+import { openai } from "../src/lib/openai";
 import { generateObject } from "ai";
 import { Prisma } from "@prisma/client";
 import crypto from "crypto";
@@ -106,10 +107,10 @@ export async function saveCV({
       },
     });
 
-    //console.log("successfully saved CV");
+    console.log("successfully saved CV");
     return savedCV;
   } catch (error) {
-    //console.error("Error saving CV:", error);
+    console.error("Error saving CV:", error);
     throw new Error(`Failed to save CV - ${error}`);
   }
 }
@@ -161,5 +162,51 @@ export async function getCVById(cvId: number) {
     return parsedCV.data;
   } catch (error) {
     throw new Error(`Failed to get CV by ID - ${error}`);
+  }
+}
+
+export async function getAllUserCVs(userDBId: string) {
+  try {
+    // Fetch CVs for the specific user by filtering with userDBId
+    const cvs = await prisma.cV.findMany({
+      where: {
+        userId: userDBId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (!cvs || cvs.length === 0) {
+      throw new Error(`No CVs found for user with ID: ${userDBId}`);
+    }
+
+    const parsedCVs = cvs.map((cv) => {
+      const parsedCV = CVSchema.safeParse(cv.extractedCV);
+
+      if (!parsedCV.success) {
+        console.error(`Invalid CV data for user: ${cv.userId}`);
+        return {
+          id: cv.id,
+          name: cv.name,
+          fileName: cv.fileName,
+          user: cv.user,
+          error: "Extracted CV data does not match the expected format",
+        };
+      }
+
+      return {
+        id: cv.id,
+        name: cv.name,
+        fileName: cv.fileName,
+        user: cv.user,
+        extractedCV: parsedCV.data,
+      };
+    });
+
+    return parsedCVs;
+  } catch (error) {
+    console.error(`Error retrieving CVs for user ${userDBId}:`, error);
+    throw new Error(`Failed to retrieve CVs for user ${userDBId} - ${error}`);
   }
 }

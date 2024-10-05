@@ -2,22 +2,22 @@
 import { CgFacebook } from "react-icons/cg";
 import { TfiLinkedin } from "react-icons/tfi";
 import { BsTwitterX } from "react-icons/bs";
-import { LogoMini } from "~/assets/LogoMini";
+import { LogoMini } from "@/assets/LogoMini";
 
 export const Footer = () => {
   return (
-    <footer className="footer bg-slate-100 text-black p-10 max-w-screen-2xl ">
+    <footer className="footer bg-slate-100 text-black p-10 max-w-screen-xl ">
       <aside className="mr-16 ">
         <LogoMini className="mb-10" />
-        <p>
-          Social Media
+        <div>
+          <p>Social Media</p>
           <br />
           <div className="flex items-center gap-2 mt-2 text-xl">
             <CgFacebook />
             <TfiLinkedin />
             <BsTwitterX />
           </div>
-        </p>
+        </div>
       </aside>
 
       <nav>

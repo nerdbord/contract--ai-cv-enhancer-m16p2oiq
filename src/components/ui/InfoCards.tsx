@@ -1,8 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
+import heroimg from "@/assets/mockimg.png";
+import Image from "next/image";
+
 export const InfoCards = () => {
   return (
     <div className="flex flex-col gap-9 items-center p-4 bg-slate-100 px-60 py-14">
       <div className="flex gap-5 items-center">
-        <img src="/mockimg.png" alt="card img" className="w-auto h-[200px]" />
+        <Image src={heroimg} alt="card img" className="w-auto h-[200px]" />
         <div className="p-6 ">
           <h2 className="text-3xl font-bold">
             Nail the keywords,
@@ -25,10 +29,10 @@ export const InfoCards = () => {
             <br /> Sapiente libero repudiandae error dicta consequuntur
           </p>
         </div>
-        <img src="/mockimg.png" alt="card img" className="w-auto h-[200px]" />
+        <Image src={heroimg} alt="card img" className="w-auto h-[200px]" />
       </div>
       <div className="flex gap-5 items-center">
-        <img src="/mockimg.png" alt="card img" className="w-auto h-[200px]" />
+        <Image src={heroimg} alt="card img" className="w-auto h-[200px]" />
         <div className="p-6 ">
           <h2 className="text-3xl font-bold">
             Nail the keywords,

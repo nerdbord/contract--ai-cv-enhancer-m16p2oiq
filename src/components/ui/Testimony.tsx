@@ -1,3 +1,6 @@
+import Image from "next/image";
+import avatar from "@/assets/avatar.png";
+
 /* eslint-disable jsx-a11y/img-redundant-alt */
 export const Testimony = () => {
   return (
@@ -14,9 +17,9 @@ export const Testimony = () => {
             </p>
           </div>
           <div className="mt-4 flex items-center w-full">
-            <img
+            <Image
               className="w-8 h-8 rounded-full"
-              src="image.png"
+              src={avatar}
               alt="Profile Image"
             />
             <span className="ml-2 text-sm">- Name</span>
@@ -30,9 +33,9 @@ export const Testimony = () => {
             </p>
           </div>
           <div className="mt-4 flex items-center w-full">
-            <img
+            <Image
               className="w-8 h-8 rounded-full"
-              src="image.png"
+              src={avatar}
               alt="Profile Image"
             />
             <span className="ml-2 text-sm">- Name</span>
@@ -46,9 +49,9 @@ export const Testimony = () => {
             </p>
           </div>
           <div className="mt-4 flex items-center w-full">
-            <img
+            <Image
               className="w-8 h-8 rounded-full"
-              src="image.png"
+              src={avatar}
               alt="Profile Image"
             />
             <span className="ml-2 text-sm">- Name</span>
@@ -62,9 +65,9 @@ export const Testimony = () => {
             </p>
           </div>
           <div className="mt-4 flex items-center w-full">
-            <img
+            <Image
               className="w-8 h-8 rounded-full"
-              src="image.png"
+              src={avatar}
               alt="Profile Image"
             />
             <span className="ml-2 text-sm">- Name</span>

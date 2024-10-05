@@ -3,6 +3,7 @@ import { LoaderFunction, redirect, ActionFunction } from "@remix-run/node";
 import { getAuth } from "@clerk/remix/ssr.server";
 import { Link, useActionData, useLoaderData } from "@remix-run/react";
 import { getUserByClerkId } from "actions/user";
+import { CVUploadForm } from "~/components/CvUploadForm";
 
 export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args);
@@ -44,6 +45,7 @@ export default function DashboardRoute() {
           </button>
         </Link>
       </div>
+      <CVUploadForm userDBId={loaderData.userDBId} />
     </main>
   );
 }
