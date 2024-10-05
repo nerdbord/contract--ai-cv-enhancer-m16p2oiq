@@ -1,4 +1,4 @@
-import { clerk } from "lib/clerk";
+/* import { clerk } from "../lib/clerk";
 import { prisma } from "lib/prisma";
 
 export async function createUserFromClerk(clerkUserId: string) {
@@ -38,3 +38,4 @@ export async function getUserByClerkId(clerkUserId: string) {
   //console.log("User found:", user);
   return user;
 }
+ */
