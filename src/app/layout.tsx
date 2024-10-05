@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { MainNavigation } from "./components/ui/MainNavigation";
 import { Footer } from "./components/ui/Footer";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -21,14 +22,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${roboto.variable} antialiased flex flex-col min-h-screen w-full max-w-screen-xl mx-auto`}
-      >
-        <MainNavigation />
-        {children}
-        <Footer />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${roboto.variable} antialiased flex flex-col min-h-screen w-full max-w-screen-xl mx-auto`}
+        >
+          <MainNavigation />
+          {children}
+          <Footer />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

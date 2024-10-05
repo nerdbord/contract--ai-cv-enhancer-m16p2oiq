@@ -54,6 +54,7 @@ const page = (props: Props) => {
             className="btn btn-primary text-white"
           >
             Go to Upload resume
+            <IoMdArrowBack className="rotate-arrow" />
           </button>
         </div>
       </div>
