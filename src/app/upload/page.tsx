@@ -1,9 +1,11 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Stepper } from "../components/ui/Stepper";
 import Link from "next/link";
-import { IoMdArrowBack } from "react-icons/io";
+import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
+import { UploadCV } from "../components/UploadCV";
+import { JobOfferForm } from "../components/JobOfferForm";
+import { EnhancedCV } from "../components/EnhancedCV";
 
 type Props = {};
 
@@ -13,7 +15,7 @@ const steps = [
   { label: "Suggestions" },
 ];
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [activeStep, setActiveStep] = useState(0);
 
   const handleNextStep = () => {
@@ -29,32 +31,40 @@ const page = (props: Props) => {
       <div className="container mx-auto px-4 flex-grow">
         <Stepper activeStep={activeStep} steps={steps} />
       </div>
-      <div className="flex flex-col items-center justify-center h-full border">
-        <div>KOMPONENT UPLOAD CV</div>
+      <div className="flex flex-col items-center justify-center h-full w-full pt-20">
+        <div
+          className="mb-8 border h-[270px] w-[650px]
+        "
+        >
+          {activeStep === 0 && <JobOfferForm />}
+          {activeStep === 1 && <UploadCV />}
+          {activeStep === 2 && <EnhancedCV />}
+        </div>
 
         <div className="w-[650px] flex justify-between items-center">
           {activeStep > 0 ? (
             <button
               onClick={handlePreviousStep}
               disabled={activeStep === 0}
-              className="btn btn-outline"
+              className="btn btn-outline flex items-center gap-2"
             >
               <IoMdArrowBack />
               Back
             </button>
           ) : (
-            <Link href="/" className="btn btn-outline">
+            <Link href="/" className="btn btn-outline flex items-center gap-2">
               <IoMdArrowBack />
               Back
             </Link>
           )}
+
           <button
             type="button"
             onClick={handleNextStep}
-            className="btn btn-primary text-white"
+            className="btn btn-primary text-white flex items-center gap-2"
           >
-            Go to Upload resume
-            <IoMdArrowBack className="rotate-arrow" />
+            {activeStep === 1 ? "Go to Suggestions" : "Go to Upload resume"}
+            <IoMdArrowForward />
           </button>
         </div>
       </div>
@@ -62,4 +72,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
