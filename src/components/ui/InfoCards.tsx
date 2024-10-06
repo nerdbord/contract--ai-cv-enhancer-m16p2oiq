@@ -2,6 +2,7 @@ import heroimg from "@/assets/mockimg.png";
 import Image from "next/image";
 import { InfoCards1 } from "@/assets/InfoCards1";
 import { InfoCards2 } from "@/assets/InfoCards2";
+import { InfoCards3 } from "@/assets/InfoCards3";
 
 export const InfoCards = () => {
   return (
@@ -37,7 +38,7 @@ export const InfoCards = () => {
         <InfoCards2 className="w-1/3 h-auto" />
       </div>
       <div className="flex gap-5 items-center">
-        <Image src={heroimg} alt="card img" className="w-auto h-[200px]" />
+        <InfoCards3 className="w-1/3 h-auto" />
         <div className="p-6 w-2/3">
           <h2 className="text-3xl  pb-[30px]">
             Download and Apply

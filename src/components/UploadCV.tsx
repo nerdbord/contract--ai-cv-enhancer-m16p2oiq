@@ -76,6 +76,7 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
                   style={{
                     height: "330px",
                     border: "none",
+                    borderBottom: "1px solid #e8e8e8",
                     boxShadow: "none",
                     overflowY: "hidden",
                   }}

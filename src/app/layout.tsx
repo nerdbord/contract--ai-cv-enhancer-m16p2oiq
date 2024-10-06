@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import { MainNavigation } from "./components/ui/MainNavigation";
-import { Footer } from "./components/ui/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
+import { MainNavigation } from "@/components/ui/MainNavigation";
+import { Footer } from "@/components/ui/Footer";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],

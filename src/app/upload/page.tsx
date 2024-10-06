@@ -1,11 +1,12 @@
 "use client";
-import React, { useState, useRef } from "react";
-import { Stepper } from "../components/ui/Stepper";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
-import { UploadCV } from "../components/UploadCV";
-import { JobOfferForm } from "../components/JobOfferForm";
-import { EnhancedCV } from "../components/EnhancedCV";
+import { Stepper } from "@/components/ui/Stepper";
+import { JobOfferForm } from "@/components/JobOfferForm";
+import UploadCV from "@/components/UploadCV";
+import { EnhancedCV } from "@/components/EnhancedCV";
+import { checkUserInDatabase } from "../../../actions/user";
 
 type Props = {};
 
@@ -15,9 +16,28 @@ const steps = [
   { label: "Suggestions" },
 ];
 
+type User = {
+  id: string;
+  email: string;
+  name: string | null;
+  clerkId: string;
+};
+
 const Page = (props: Props) => {
   const [activeStep, setActiveStep] = useState(0);
+  const [file, setFile] = useState<File | null>(null);
+  const [jobLink, setJobLink] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await checkUserInDatabase();
+      setUser(userData);
+    };
+
+    fetchUser();
+  }, []);
 
   const handleNextStep = () => {
     if (activeStep === 0 && formRef.current) {
@@ -33,18 +53,14 @@ const Page = (props: Props) => {
 
   const onJobOfferFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const formData = new FormData(e.currentTarget);
-    const jobDescription = formData.get("jobDescription") as string;
-
-    console.log("Job offer form submitted");
-    console.log("Job Description:", jobDescription);
-
+    const jobLink = formData.get("jobDescription") as string;
+    setJobLink(jobLink);
     setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
   };
 
   const onFileUpload = (file: File) => {
-    console.log("File uploaded:", file);
+    setFile(file);
   };
 
   return (

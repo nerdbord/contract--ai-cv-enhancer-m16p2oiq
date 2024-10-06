@@ -1,10 +1,19 @@
 import Link from "next/link";
 import React from "react";
 import { GoPlus } from "react-icons/go";
-import { CVCard } from "../components/ui/CVcard";
+//import { CVCard } from "./components/CVCard";
+import { redirect } from "next/navigation";
+import { checkUserInDatabase } from "../../../actions/user";
+
 type Props = {};
 
-const page = (props: Props) => {
+const page = async (props: Props) => {
+  const user = await checkUserInDatabase();
+
+  if (!user) {
+    redirect("/");
+  }
+
   return (
     <div className="flex flex-col max-w-screen-2xl flex-grow px-[60px] py-16 bg-white h-full">
       <div className="container mx-auto px-4 flex-grow">
