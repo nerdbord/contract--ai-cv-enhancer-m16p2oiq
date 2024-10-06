@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Worker, Viewer } from "@react-pdf-viewer/core";
@@ -13,6 +10,42 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  const validateFile = (file: File): boolean => {
+    const validFormats = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+
+    if (!validFormats.includes(file.type)) {
+      setErrorMessage(
+        "Invalid file format. Please upload a PDF or Word document."
+      );
+      return false;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMessage("File size exceeds 2MB limit.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleFileUpload = (file: File) => {
+    if (validateFile(file)) {
+      setErrorMessage(null);
+      setUploadedFile(file);
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+      const newUrl = URL.createObjectURL(file);
+      setPdfUrl(newUrl);
+      onFileUpload(file);
+    }
+  };
 
   const handleDivClick = () => {
     if (fileInputRef.current) {
@@ -23,38 +56,22 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const validFormats = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ];
-      if (!validFormats.includes(file.type)) {
-        setErrorMessage(
-          "Invalid file format. Please upload a PDF or Word document."
-        );
-        return;
-      }
-      setErrorMessage(null);
-      setUploadedFile(file);
-      onFileUpload(file);
-      console.log("Selected file:", file);
+      handleFileUpload(file);
     }
   };
 
   return (
     <div className="flex flex-col justify-center items-center gap-8">
       {!uploadedFile && (
-        <h1 className="text-center text-5xl not-italic font-normal ">
+        <h1 className="text-center text-5xl not-italic font-normal">
           Upload your resume
         </h1>
       )}
       {uploadedFile ? (
-        <div className="uploaded-file flex flex-col items-center gap-4 w-full ">
+        <div className="uploaded-file flex flex-col items-center gap-4 w-full">
           {uploadedFile.type === "application/pdf" && (
             <div className="w-full h-96">
-              <Worker
-                workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}
-              >
+              <Worker workerUrl="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js">
                 <div
                   style={{
                     height: "330px",
@@ -63,7 +80,15 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
                     overflowY: "hidden",
                   }}
                 >
-                  <Viewer fileUrl={URL.createObjectURL(uploadedFile)} />
+                  <Viewer
+                    fileUrl={pdfUrl || ""}
+                    renderLoader={(percentages: number) => (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                        <span className="ml-2">Loading PDF...</span>
+                      </div>
+                    )}
+                  />
                 </div>
               </Worker>
             </div>
@@ -76,7 +101,7 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
         </div>
       ) : (
         <div
-          className="upload flex flex-col justify-center items-center gap-4 border border-slate-300 rounded-lg w-full p-6 cursor-pointer"
+          className="upload flex flex-col justify-center items-center gap-4 border border-slate-300 rounded-lg w-full p-6 cursor-pointer hover:border-slate-400 transition-colors"
           onClick={handleDivClick}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -87,21 +112,7 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
             e.preventDefault();
             const file = e.dataTransfer.files[0];
             if (file) {
-              const validFormats = [
-                "application/pdf",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-              ];
-              if (!validFormats.includes(file.type)) {
-                setErrorMessage(
-                  "Invalid file format. Please upload a PDF or Word document."
-                );
-                return;
-              }
-              setErrorMessage(null);
-              setUploadedFile(file);
-              onFileUpload(file);
-              console.log("Dropped file:", file);
+              handleFileUpload(file);
             }
           }}
           onDragOver={(e) => e.preventDefault()}
@@ -118,7 +129,7 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
           <input
             type="file"
             ref={fileInputRef}
-            style={{ display: "none" }}
+            className="hidden"
             onChange={handleFileChange}
             accept=".pdf,.doc,.docx"
           />
@@ -130,6 +141,7 @@ export const UploadCV: React.FC<{ onFileUpload: (file: File) => void }> = ({
     </div>
   );
 };
+
 UploadCV.propTypes = {
   onFileUpload: PropTypes.func.isRequired,
 };

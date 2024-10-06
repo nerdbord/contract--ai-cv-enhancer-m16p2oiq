@@ -6,7 +6,6 @@ import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
 import { UploadCV } from "../../notes/UploadCV2";
 import { JobOfferForm } from "../components/JobOfferForm";
 import { EnhancedCV } from "../components/EnhancedCV";
-import { on } from "events";
 
 type Props = {};
 
