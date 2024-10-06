@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react";
 import { Stepper } from "../components/ui/Stepper";
 import Link from "next/link";
 import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
-import { UploadCV } from "../../notes/UploadCV2";
+import { UploadCV } from "../components/UploadCV";
 import { JobOfferForm } from "../components/JobOfferForm";
 import { EnhancedCV } from "../components/EnhancedCV";
 
