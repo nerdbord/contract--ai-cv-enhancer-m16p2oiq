@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react";
 import { Stepper } from "../components/ui/Stepper";
 import Link from "next/link";
 import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
-import { UploadCV } from "../components/UploadCV";
+import { UploadCV } from "../../notes/UploadCV2";
 import { JobOfferForm } from "../components/JobOfferForm";
 import { EnhancedCV } from "../components/EnhancedCV";
 import { on } from "events";
@@ -83,7 +83,7 @@ const Page = (props: Props) => {
             onClick={handleNextStep}
             className="btn btn-primary text-white flex items-center gap-2"
           >
-            {activeStep === 1 ? "Go to Suggestions" : "Go to Upload resume"}
+            {activeStep === 1 ? "Get tailored Resume" : "Go to Upload resume"}
             <IoMdArrowForward />
           </button>
         </div>

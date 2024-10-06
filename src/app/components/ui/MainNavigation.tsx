@@ -16,7 +16,7 @@ export const MainNavigation = () => {
         <div className="flex gap-8 items-center">
           {pathname === "/upload" && (
             <Link
-              href="/upload"
+              href="/dashboard"
               className="btn btn-ghost text-normal font-light"
             >
               Dashboard
