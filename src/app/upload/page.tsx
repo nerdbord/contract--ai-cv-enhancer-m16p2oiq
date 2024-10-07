@@ -7,6 +7,8 @@ import { JobOfferForm } from "@/components/JobOfferForm";
 import UploadCV from "@/components/UploadCV";
 import { EnhancedCV } from "@/components/EnhancedCV";
 import { checkUserInDatabase } from "../../../actions/user";
+import { cvToJSON } from "../../../actions/cv";
+import { Loader } from "@/components/ui/Loader";
 
 type Props = {};
 
@@ -27,8 +29,11 @@ const Page = (props: Props) => {
   const [activeStep, setActiveStep] = useState(0);
   const [file, setFile] = useState<File | null>(null);
   const [jobLink, setJobLink] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [cv, setCv] = useState<any | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,7 +44,7 @@ const Page = (props: Props) => {
     fetchUser();
   }, []);
 
-  const handleNextStep = () => {
+  const handleGoToUploadResume = () => {
     if (activeStep === 0 && formRef.current) {
       formRef.current.requestSubmit();
     } else {
@@ -59,8 +64,42 @@ const Page = (props: Props) => {
     setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
   };
 
-  const onFileUpload = (file: File) => {
+  const handleGetTailoredResume = async () => {
+    if (!file) {
+      setFileError("Please upload a file before proceeding.");
+      return;
+    }
+    setFileError(null); // Clear previous errors
+    console.log("GET TAILORED RESUME");
+    setLoading(true);
+    await cvtojson();
+
+    if (cv) {
+      setLoading(true);
+      try {
+        // Your logic here
+      } catch (error) {
+        console.error("Error getting tailored resume:", error);
+        setLoading(false);
+      }
+    }
+    setLoading(false);
+    setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+  };
+
+  const onFileUpload = async (file: File) => {
     setFile(file);
+    setFileError(null); // Clear error when a file is uploaded
+  };
+
+  const cvtojson = async () => {
+    if (file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const cvData = await cvToJSON(buffer);
+      setCv(cvData);
+      console.log(cv);
+    }
   };
 
   return (
@@ -69,39 +108,64 @@ const Page = (props: Props) => {
         <Stepper activeStep={activeStep} steps={steps} />
       </div>
       <div className="flex flex-col items-center justify-center h-full w-full pt-16">
-        <div className="mb-8 h-[330px] w-[650px]">
-          {activeStep === 0 && (
-            <JobOfferForm ref={formRef} onSubmit={onJobOfferFormSubmit} />
-          )}
-          {activeStep === 1 && <UploadCV onFileUpload={onFileUpload} />}
-          {activeStep === 2 && <EnhancedCV />}
-        </div>
+        {loading ? (
+          <div className="pb-32">
+            <Loader
+              mainText="We're working on your CV..."
+              subText="Your document is being enhanced."
+              subText2="This will only take a moment!"
+            />
+          </div>
+        ) : (
+          <>
+            <div className="mb-8 h-[330px] w-[650px]">
+              {activeStep === 0 && (
+                <JobOfferForm ref={formRef} onSubmit={onJobOfferFormSubmit} />
+              )}
+              {activeStep === 1 && <UploadCV onFileUpload={onFileUpload} />}
+              {activeStep === 2 && <EnhancedCV />}
+            </div>
 
-        <div className="w-[650px] flex justify-between items-center">
-          {activeStep > 0 ? (
-            <button
-              onClick={handlePreviousStep}
-              disabled={activeStep === 0}
-              className="btn btn-outline flex items-center gap-2"
-            >
-              <IoMdArrowBack />
-              Back
-            </button>
-          ) : (
-            <Link href="/" className="btn btn-outline flex items-center gap-2">
-              <IoMdArrowBack />
-              Back
-            </Link>
-          )}
+            {fileError && <div className="text-red-500 mb-4">{fileError}</div>}
 
-          <button
-            onClick={handleNextStep}
-            className="btn btn-primary text-white flex items-center gap-2"
-          >
-            {activeStep === 1 ? "Get tailored Resume" : "Go to Upload resume"}
-            <IoMdArrowForward />
-          </button>
-        </div>
+            <div className="w-[650px] flex justify-between items-center">
+              {activeStep > 0 ? (
+                <button
+                  onClick={handlePreviousStep}
+                  disabled={activeStep === 0}
+                  className="btn btn-outline flex items-center gap-2"
+                >
+                  <IoMdArrowBack />
+                  Back
+                </button>
+              ) : (
+                <Link
+                  href="/"
+                  className="btn btn-outline flex items-center gap-2"
+                >
+                  <IoMdArrowBack />
+                  Back
+                </Link>
+              )}
+
+              <button
+                onClick={() => {
+                  if (activeStep === 1) {
+                    handleGetTailoredResume();
+                  } else {
+                    handleGoToUploadResume();
+                  }
+                }}
+                className="btn btn-primary text-white flex items-center gap-2"
+              >
+                {activeStep === 1
+                  ? "Get tailored Resume"
+                  : "Go to Upload resume"}
+                <IoMdArrowForward />
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

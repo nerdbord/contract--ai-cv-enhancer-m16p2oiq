@@ -22,7 +22,7 @@ export async function checkUserInDatabase() {
           data: newUser,
         });
       }
-      console.log(existingUser);
+      //console.log(existingUser);
       return existingUser;
     } else {
       return null;
