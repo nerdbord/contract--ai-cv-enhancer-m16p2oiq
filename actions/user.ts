@@ -11,7 +11,6 @@ export async function createUserFromClerk(clerkUserId: string) {
       throw new Error("Clerk user not found.");
     }
 
-    // Extract email and name from Clerk user object
     const email = clerkUser.emailAddresses?.[0]?.emailAddress || "";
     const firstName = clerkUser.firstName || "";
     const lastName = clerkUser.lastName || "";
@@ -20,12 +19,10 @@ export async function createUserFromClerk(clerkUserId: string) {
         ? `${firstName} ${lastName}`
         : firstName || lastName || "No name provided";
 
-    // Validation to ensure email is present
     if (!email) {
       throw new Error("No email address available for this Clerk user.");
     }
 
-    // Upsert user into the Prisma database
     const user = await prisma.user.upsert({
       where: { clerkId: clerkUserId },
       update: {
@@ -39,7 +36,7 @@ export async function createUserFromClerk(clerkUserId: string) {
       },
     });
 
-    console.log("User successfully created or updated from Clerk:", user);
+    //console.log("User successfully created or updated from Clerk:", user);
     return user;
   } catch (error) {
     console.error("Error creating/updating user from Clerk:", error);
