@@ -1,14 +1,21 @@
-import type { MetaFunction } from "@remix-run/node";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { FAQ } from "~/components/ui/FAQ";
 import { Hero } from "~/components/ui/Hero";
 import { InfoCards } from "~/components/ui/InfoCards";
 import { Testimony } from "~/components/ui/Testimony";
+import { getAuth } from "@clerk/remix/ssr.server";
+import { createUserFromClerk } from "../../actions/user";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
+export const loader: LoaderFunction = async (args) => {
+  const { userId } = await getAuth(args);
+  if (!userId) {
+    return { userDBId: null };
+  }
+
+  const user = await createUserFromClerk(userId);
+  const userDBId = user?.id;
+  return { userDBId };
 };
 
 export default function Index() {

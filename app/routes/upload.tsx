@@ -8,6 +8,19 @@ import { Link } from "@remix-run/react";
 import { UploadCV } from "~/components/UploadCV";
 import { EnhancedCV } from "~/components/EnhancedCV";
 import { Loader } from "~/components/ui/Loader";
+import { LoaderFunction } from "@remix-run/node";
+import { createUserFromClerk } from "actions/user";
+import { getAuth } from "@clerk/remix/ssr.server";
+
+export const loader: LoaderFunction = async (args) => {
+  const { userId } = await getAuth(args);
+  if (!userId) {
+    throw new Error("User ID is null");
+  }
+  const user = await createUserFromClerk(userId);
+  const userDBId = user?.id;
+  return { userDBId };
+};
 
 const steps = [
   { label: "Job description" },
