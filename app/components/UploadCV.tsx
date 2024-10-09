@@ -43,13 +43,14 @@ export const UploadCV: React.FC<UploadCVProps> = ({ onFileUpload }) => {
     }
   };
 
+  /* 
   const handleRemoveFile = (): void => {
     setFile(null);
     setFileError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };
+  }; */
 
   return (
     <div className="upload-cv-container w-full">
@@ -84,11 +85,6 @@ export const UploadCV: React.FC<UploadCVProps> = ({ onFileUpload }) => {
                 </div>
               </Worker>
             </div>
-          )}
-          {file.type !== "application/pdf" && (
-            <p className="text-center text-lg not-italic font-normal leading-7">
-              File uploaded: {file.name}
-            </p>
           )}
         </div>
       ) : (

@@ -1,9 +1,7 @@
 import { createOpenAI } from "@ai-sdk/openai";
 
 //custom Nerdbord OpenAI client
-
 export const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
   fetch: async (url, options) => {
     const fullUrl =
       "https://training.nerdbord.io/api/v1/openai/chat/completions";
@@ -14,3 +12,4 @@ export const openai = createOpenAI({
     return result;
   },
 });
+``;
