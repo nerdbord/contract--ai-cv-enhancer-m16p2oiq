@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import "./tailwind.css";
 import {
   Links,
@@ -36,16 +37,15 @@ export const meta: MetaFunction = () => [
   },
 ];
 
-export const loader: LoaderFunction = (args) => rootAuthLoader(args);
-/* export const loader: LoaderFunction = (args) => {
-
+//export const loader: LoaderFunction = (args) => rootAuthLoader(args);
+export const loader: LoaderFunction = (args) => {
   return rootAuthLoader(args, ({ request }) => {
     const { sessionId, userId, getToken } = request.auth;
     // Add logic to fetch data
     //console.log({ sessionId, userId, getToken });
     return { yourData: "here" };
   });
-}; */
+};
 
 export function App() {
   return (

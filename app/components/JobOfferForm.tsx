@@ -6,7 +6,8 @@ interface JobDescriptionFormProps {
   };
   errorMessage?: string;
   onSubmit?: React.FormEventHandler<HTMLFormElement>;
-  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>; // Update type
+  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
+  defaultValue?: string;
 }
 
 export const JobOfferForm = forwardRef<

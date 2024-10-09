@@ -5,10 +5,14 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import { UploadIcon } from "./ui/UploadIcon";
 
 interface UploadCVProps {
-  onFileUpload: (file: File) => void;
+  onFileUpload?: (file: File) => void;
+  errorMessage?: string;
 }
 
-export const UploadCV: React.FC<UploadCVProps> = ({ onFileUpload }) => {
+export const UploadCV: React.FC<UploadCVProps> = ({
+  onFileUpload,
+  errorMessage,
+}) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -100,7 +104,9 @@ export const UploadCV: React.FC<UploadCVProps> = ({ onFileUpload }) => {
             e.preventDefault();
             const file = e.dataTransfer.files[0];
             if (file) {
-              onFileUpload(file);
+              if (onFileUpload) {
+                onFileUpload(file);
+              }
             }
           }}
           onDragOver={(e) => e.preventDefault()}

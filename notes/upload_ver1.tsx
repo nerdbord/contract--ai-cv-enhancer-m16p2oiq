@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
-import { Stepper } from "../components/ui/Stepper";
-import { JobOfferForm } from "../components/JobOfferForm";
+import { Stepper } from "~/components/ui/Stepper";
+import { JobOfferForm } from "~/components/JobOfferForm";
 import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { Link } from "@remix-run/react";
-import { UploadCV } from "../components/UploadCV";
-import { EnhancedCV } from "../components/EnhancedCV";
-import { Loader } from "../components/ui/Loader";
+import { UploadCV } from "~/components/UploadCV";
+import { EnhancedCV } from "~/components/EnhancedCV";
+import { Loader } from "~/components/ui/Loader";
 import { LoaderFunction } from "@remix-run/node";
-import { createUserFromClerk } from "../../actions/user";
+import { createUserFromClerk } from "actions/user";
 import { getAuth } from "@clerk/remix/ssr.server";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import React from "react";
 
 export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args);
@@ -35,7 +33,6 @@ export default function UploadPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [jobOffer, setJobOffer] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [base64CV, setBase64CV] = useState<string | null>(null);
 
   // job offer
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -60,25 +57,6 @@ export default function UploadPage() {
   };
 
   // cv upload
-  const handleFileSelect = (file: File) => {
-    const fileReader = new FileReader();
-
-    fileReader.onloadend = () => {
-      if (fileReader.result) {
-        const base64String = fileReader.result.toString().split(",")[1];
-        // setUploadedFile(base64String); // Removed as it expects a File or null
-        setBase64CV(base64String);
-        console.log("Base64 CV:", base64String);
-      }
-    };
-
-    fileReader.onerror = () => {
-      setError("Error reading file");
-    };
-
-    fileReader.readAsDataURL(file);
-    setError(null);
-  };
   const onFileUpload = () => {
     setError(null);
     if (!uploadedFile) {
@@ -90,7 +68,15 @@ export default function UploadPage() {
       }, 2000);
       return;
     }
+    setIsLoading(true);
+    setError(null);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  };
 
+  const handleFileSelect = (file: File) => {
+    setUploadedFile(file);
     setError(null);
   };
 
