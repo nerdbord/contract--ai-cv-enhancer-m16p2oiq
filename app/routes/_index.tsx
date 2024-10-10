@@ -3,7 +3,7 @@ import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { FAQ } from "~/components/ui/FAQ";
 import { Hero } from "~/components/ui/Hero";
 import { InfoCards } from "~/components/ui/InfoCards";
-import { Testimony } from "~/components/ui/Testimony";
+import { ResumePitfalls } from "~/components/ui/ResumePitfalls";
 import { getAuth } from "@clerk/remix/ssr.server";
 import { createUserFromClerk } from "../../actions/user";
 
@@ -23,7 +23,7 @@ export default function Index() {
     <div className="flex flex-col h-full w-full items-center justify-center max-w-screen-xl">
       <Hero />
       <InfoCards />
-      <Testimony />
+      <ResumePitfalls />
       <FAQ />
     </div>
   );
