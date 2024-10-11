@@ -5,16 +5,17 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import { UploadIcon } from "./ui/UploadIcon";
 
 interface UploadCVProps {
-  onFileUpload?: (file: File) => void;
+  onFileUpload: (file: File | null) => void;
   errorMessage?: string;
+  file: File | null;
 }
 
 export const UploadCV: React.FC<UploadCVProps> = ({
   onFileUpload,
   errorMessage,
+  file,
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
 
   const handleDivClick = () => {
@@ -23,38 +24,47 @@ export const UploadCV: React.FC<UploadCVProps> = ({
     }
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const selectedFile = event.target.files?.[0] || null;
-
+  const validateAndProcessFile = (selectedFile: File | null) => {
     if (selectedFile) {
       const validTypes = [
         "application/pdf",
         "application/msword",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       ];
+
       if (!validTypes.includes(selectedFile.type)) {
         setFileError(
           "Invalid file type. Please upload a PDF or Word document."
         );
-        setFile(null);
-      } else if (selectedFile.size > 2 * 1024 * 1024) {
-        setFileError("File size exceeds 2MB. Please upload a smaller file.");
-        setFile(null);
-      } else {
-        setFileError(null);
-        setFile(selectedFile);
+        onFileUpload(null);
+        return false;
       }
+
+      if (selectedFile.size > 2 * 1024 * 1024) {
+        setFileError("File size exceeds 2MB. Please upload a smaller file.");
+        onFileUpload(null);
+        return false;
+      }
+
+      setFileError(null);
+      onFileUpload(selectedFile);
+      return true;
     }
+    return false;
   };
 
-  /* 
-  const handleRemoveFile = (): void => {
-    setFile(null);
-    setFileError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const selectedFile = event.target.files?.[0] || null;
+    validateAndProcessFile(selectedFile);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const selectedFile = e.dataTransfer.files[0];
+    if (selectedFile) {
+      validateAndProcessFile(selectedFile);
     }
-  }; */
+  };
 
   return (
     <div className="upload-cv-container w-full">
@@ -78,7 +88,7 @@ export const UploadCV: React.FC<UploadCVProps> = ({
                   }}
                 >
                   <Viewer
-                    fileUrl={file ? URL.createObjectURL(file) : ""}
+                    fileUrl={URL.createObjectURL(file)}
                     renderLoader={(percentages: number) => (
                       <div className="flex items-center justify-center h-full">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -88,6 +98,14 @@ export const UploadCV: React.FC<UploadCVProps> = ({
                   />
                 </div>
               </Worker>
+            </div>
+          )}
+          {file.type.includes("word") && (
+            <div className="p-4 bg-gray-100 rounded w-full text-center">
+              <p className="font-medium">{file.name}</p>
+              <p className="text-sm text-gray-600">
+                Word document uploaded successfully
+              </p>
             </div>
           )}
         </div>
@@ -100,15 +118,7 @@ export const UploadCV: React.FC<UploadCVProps> = ({
               handleDivClick();
             }
           }}
-          onDrop={(e) => {
-            e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file) {
-              if (onFileUpload) {
-                onFileUpload(file);
-              }
-            }
-          }}
+          onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           role="button"
           tabIndex={0}
@@ -132,8 +142,9 @@ export const UploadCV: React.FC<UploadCVProps> = ({
         </div>
       )}
       {fileError && <p className="text-red-500 text-sm mt-2">{fileError}</p>}
+      {errorMessage && (
+        <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
+      )}
     </div>
   );
 };
-
-export default UploadCV;

@@ -18,11 +18,12 @@ model User {
   email    String     @unique
   name     String?
   clerkId  String     @unique
-  cv       CV[]   // Relacja z modelem UserCV
+  cv       originalCV[]   // Relacja z modelem UserCV
 }
 
-model CV {
+model originalCV {
   id        Int       @id @default(sequence())
+  constantName String
   name      String   
   fileName  String  
   cv        Bytes     

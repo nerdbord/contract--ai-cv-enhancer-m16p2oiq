@@ -42,7 +42,6 @@ export const cvToJSON = async (buffer: Buffer) => {
     return result.object;
   } catch (error) {
     console.error("Błąd podczas ekstrakcji tekstu z CV:", error);
-    throw new Error("Nie udało się wyekstrahować tekstu z dostarczonego CV.");
   }
 };
 
@@ -50,7 +49,7 @@ const computeFileHash = (buffer: Buffer): string => {
   return crypto.createHash("sha256").update(buffer).digest("hex");
 };
 
-type SaveCVParams = {
+type SaveOriginalCVParams = {
   fileBuffer: Buffer;
   name: string;
   fileName: string;
@@ -59,18 +58,20 @@ type SaveCVParams = {
   extractedCV: object;
 };
 
-export async function saveCV({
+export async function saveOriginalCV({
   fileBuffer,
   name,
   fileName,
   mimeType,
   userId,
   extractedCV,
-}: SaveCVParams) {
+}: SaveOriginalCVParams) {
   try {
     const cvHash = computeFileHash(fileBuffer);
+    const constantName = "Original CV" + cvHash;
 
-    const savedCV = await prisma.cV.create({
+    const savedCV = await prisma.originalCV.create({
+      // Use originalCV model here
       data: {
         cv: fileBuffer,
         name,
@@ -78,14 +79,14 @@ export async function saveCV({
         mimeType,
         userId,
         cvHash,
+        constantName,
         extractedCV: extractedCV as Prisma.JsonObject,
       },
     });
 
-    console.log("successfully saved CV");
+    console.log("Successfully saved CV");
     return savedCV;
   } catch (error) {
     console.error("Error saving CV:", error);
-    throw new Error(`Failed to save CV - ${error}`);
   }
 }

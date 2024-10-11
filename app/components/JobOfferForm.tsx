@@ -27,11 +27,11 @@ export const JobOfferForm = forwardRef<
       resume to.
     </p>
     <textarea
-      name="jobDescription" // Updated name to match state key
-      className="gap-6 border border-slate-300 rounded-lg w-full h-[188px] p-6 cursor-pointer bg-inherit resize-none"
+      name="jobDescription"
+      className="gap-6 border border-slate-300 rounded-lg w-[650px] h-[188px] p-6 cursor-pointer bg-inherit resize-none flex-grow" // Added flex-grow
       placeholder="e.g. https://theprotocol.it/filtry/backend;sp/praca/junior-php-developer or leave it empty if you want only to enhance your resume"
       defaultValue={actionData?.jobDescription || ""}
-      onChange={onChange} // Attach onChange here
+      onChange={onChange}
     />
     {errorMessage && <div className="text-red-500 mt-4">{errorMessage}</div>}
   </form>
