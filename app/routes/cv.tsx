@@ -453,7 +453,7 @@ I hereby consent to my personal data being processed by (company name) for the p
                   </div>
                 )}
                 {activeStep === 2 &&
-                  (loaderData.userDBId ? (
+                  (!loaderData.userDBId ? (
                     <div className="flex flex-col items-center w-full">
                       <Link
                         to="/sign-in"
