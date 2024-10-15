@@ -174,13 +174,13 @@ export default function CVRoute() {
 
     const doc = new jsPDF();
     doc.setFontSize(14);
-    doc.setFont("Roboto", "bold");
+    doc.setFont("helvetica", "bold");
     doc.text(generatedCV.name, 105, 15, { align: "center" });
     doc.setFontSize(12);
     doc.text(generatedCV.occupation, 105, 23, { align: "center" });
 
     doc.setFontSize(10);
-    doc.setFont("Roboto", "normal");
+    doc.setFont("helvetica", "normal");
     let currentY = 35;
     const pageHeight = doc.internal.pageSize.height; // wysokość strony
 
@@ -269,52 +269,61 @@ export default function CVRoute() {
       doc.setFont("helvetica", "bold");
       doc.text("Projects:", 10, currentY);
       currentY += 6;
-      doc.setFont("helvetica", "normal");
+
       generatedCV.projects.forEach((project) => {
-        // Dodanie tytułu projektu i linku obok siebie
+        doc.setFont("helvetica", "bold");
+        // Tytuł projektu z linkiem obok
         doc.textWithLink(project.title, 10, currentY, { url: project.link });
-        doc.text(` (${project.link})`, 60, currentY); // Wyświetlenie linku obok tytułu
+        doc.setFont("helvetica", "normal");
+        doc.text(
+          `(${project.link})`,
+          doc.getTextWidth(project.title) + 12,
+          currentY
+        ); // Link obok tytułu projektu
 
         currentY += 6;
+
+        // Opis projektu
         doc.text(`Description: ${project.description}`, 10, currentY, {
           maxWidth: 180,
         });
+
         currentY += 6;
+
+        // Technologie użyte w projekcie
         doc.text(
           `Technologies: ${project.technologies.join(", ")}`,
           10,
           currentY
         );
+
         currentY += 12;
-        currentY = checkPageEnd(currentY); // Sprawdzenie końca strony
+
+        // Sprawdzenie, czy konieczne jest dodanie nowej strony
+        currentY = checkPageEnd(currentY);
       });
     }
 
-    // Add consent clause
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
 
-    // Tekst zgody RODO
     const rodoConsent = `
 Wyrażam zgodę na przetwarzanie moich danych osobowych dla potrzeb niezbędnych do realizacji procesu rekrutacji zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych i w sprawie swobodnego przepływu takich danych oraz uchylenia dyrektywy 95/46/WE (RODO).
 `;
 
-    // Zwijanie tekstu na mniejsze linie (maxWidth = 180)
     const rodoConsentLines = doc.splitTextToSize(rodoConsent, 180);
     doc.text(rodoConsentLines, 10, currentY);
-    currentY += rodoConsentLines.length * 4; // Dostosowanie Y w zależności od liczby linii
-    currentY = checkPageEnd(currentY); // Sprawdzanie, czy trzeba dodać stronę
+    currentY += rodoConsentLines.length * 4;
+    currentY = checkPageEnd(currentY);
 
-    // Tekst zgody po angielsku
     const englishConsent = `
 I hereby consent to my personal data being processed by (company name) for the purpose of considering my application for the vacancy advertised under reference number (123XX6 etc.).
 `;
 
-    // Zwijanie tekstu na mniejsze linie (maxWidth = 180)
     const englishConsentLines = doc.splitTextToSize(englishConsent, 180);
     doc.text(englishConsentLines, 10, currentY);
-    currentY += englishConsentLines.length * 4; // Dostosowanie Y w zależności od liczby linii
-    currentY = checkPageEnd(currentY); // Sprawdzanie, czy trzeba dodać stronę
+    currentY += englishConsentLines.length * 4;
+    currentY = checkPageEnd(currentY);
 
     doc.save(`${generatedCV.name}_CV.pdf`);
   };
