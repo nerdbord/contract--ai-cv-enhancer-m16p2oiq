@@ -14,6 +14,7 @@ import { Loader } from "~/components/ui/Loader";
 import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 import { UploadIcon } from "~/components/ui/UploadIcon";
 import { TfiDownload } from "react-icons/tfi";
+import jsPDF from "jspdf";
 
 export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args);
@@ -94,9 +95,9 @@ export const action: ActionFunction = async ({ request }) => {
     return { error: (error as Error).message, step: 2 };
   }
 };
-
 type CVData = {
   name: string;
+  occupation: string;
   contact: {
     email: string;
     phone: string;
@@ -112,6 +113,7 @@ type CVData = {
     company: string;
     duration: string;
     description: string;
+    duties: string[];
   }[];
   education: {
     degree: string;
@@ -119,7 +121,7 @@ type CVData = {
     duration: string;
   }[];
   projects: {
-    name: string;
+    title: string;
     description: string;
     technologies: string[];
     link: string;
@@ -148,6 +150,7 @@ export default function CVRoute() {
   const [activeStep, setActiveStep] = useState(actionData?.step ?? 0);
   const [isLoading, setIsLoading] = useState(false);
   const [generatedCV, setGeneratedCV] = useState<CVData | null>(null);
+  const [fileName, setFileName] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -160,6 +163,161 @@ export default function CVRoute() {
       setGeneratedCV(actionData.cvData);
     }
   }, [actionData]);
+
+  useEffect(() => {
+    if (actionData?.fileName) {
+      setFileName(actionData.fileName || "");
+    }
+  }, [actionData]);
+  const downloadCVAsPDF = () => {
+    if (!generatedCV) return;
+
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.setFont("Roboto", "bold");
+    doc.text(generatedCV.name, 105, 15, { align: "center" });
+    doc.setFontSize(12);
+    doc.text(generatedCV.occupation, 105, 23, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.setFont("Roboto", "normal");
+    let currentY = 35;
+    const pageHeight = doc.internal.pageSize.height; // wysokość strony
+
+    const checkPageEnd = (y: number) => {
+      if (y > pageHeight - 20) {
+        // 20px marginesu na dole
+        doc.addPage();
+        return 15; // resetuje Y dla nowej strony
+      }
+      return y;
+    };
+
+    doc.text(`Email: ${generatedCV.contact.email}`, 10, currentY);
+    currentY += 6;
+    doc.text(`Phone: ${generatedCV.contact.phone}`, 10, currentY);
+    currentY += 6;
+    if (generatedCV.contact.portfolio) {
+      doc.text(`Portfolio: ${generatedCV.contact.portfolio}`, 10, currentY);
+      currentY += 6;
+    }
+    if (generatedCV.contact.linkedin) {
+      doc.text(`LinkedIn: ${generatedCV.contact.linkedin}`, 10, currentY);
+      currentY += 6;
+    }
+
+    currentY += 4;
+    currentY = checkPageEnd(currentY);
+    if (generatedCV.summaryStatement) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Summary statement:", 10, currentY);
+      currentY += 6;
+      doc.setFont("helvetica", "normal");
+      doc.text(generatedCV.summaryStatement, 10, currentY, { maxWidth: 180 });
+      currentY += 12;
+      currentY = checkPageEnd(currentY);
+    }
+
+    if (generatedCV.languages && generatedCV.languages.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Languages:", 10, currentY);
+      currentY += 6;
+      doc.setFont("helvetica", "normal");
+      doc.text(generatedCV.languages.join(", "), 10, currentY);
+      currentY += 12;
+      currentY = checkPageEnd(currentY);
+    }
+
+    if (generatedCV.technologies && generatedCV.technologies.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Technologies:", 10, currentY);
+      currentY += 6;
+      doc.setFont("helvetica", "normal");
+      doc.text(generatedCV.technologies.join(", "), 10, currentY);
+      currentY += 12;
+      currentY = checkPageEnd(currentY);
+    }
+
+    if (generatedCV.experience && generatedCV.experience.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Experience:", 10, currentY);
+      currentY += 6;
+      doc.setFont("helvetica", "normal");
+      generatedCV.experience.forEach((exp) => {
+        doc.text(`${exp.position} at ${exp.company}`, 10, currentY);
+        currentY += 6;
+        doc.text(`Duration: ${exp.duration}`, 10, currentY);
+        currentY += 6;
+        doc.text(`Description: ${exp.description}`, 10, currentY, {
+          maxWidth: 180,
+        });
+        currentY += 6;
+        if (exp.duties && exp.duties.length > 0) {
+          doc.text("Duties:", 10, currentY);
+          currentY += 6;
+          exp.duties.forEach((duty) => {
+            doc.text(`- ${duty}`, 10, currentY);
+            currentY += 6;
+          });
+        }
+        currentY += 6;
+        currentY = checkPageEnd(currentY);
+      });
+    }
+
+    if (generatedCV.projects && generatedCV.projects.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Projects:", 10, currentY);
+      currentY += 6;
+      doc.setFont("helvetica", "normal");
+      generatedCV.projects.forEach((project) => {
+        // Dodanie tytułu projektu i linku obok siebie
+        doc.textWithLink(project.title, 10, currentY, { url: project.link });
+        doc.text(` (${project.link})`, 60, currentY); // Wyświetlenie linku obok tytułu
+
+        currentY += 6;
+        doc.text(`Description: ${project.description}`, 10, currentY, {
+          maxWidth: 180,
+        });
+        currentY += 6;
+        doc.text(
+          `Technologies: ${project.technologies.join(", ")}`,
+          10,
+          currentY
+        );
+        currentY += 12;
+        currentY = checkPageEnd(currentY); // Sprawdzenie końca strony
+      });
+    }
+
+    // Add consent clause
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+
+    // Tekst zgody RODO
+    const rodoConsent = `
+Wyrażam zgodę na przetwarzanie moich danych osobowych dla potrzeb niezbędnych do realizacji procesu rekrutacji zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych i w sprawie swobodnego przepływu takich danych oraz uchylenia dyrektywy 95/46/WE (RODO).
+`;
+
+    // Zwijanie tekstu na mniejsze linie (maxWidth = 180)
+    const rodoConsentLines = doc.splitTextToSize(rodoConsent, 180);
+    doc.text(rodoConsentLines, 10, currentY);
+    currentY += rodoConsentLines.length * 4; // Dostosowanie Y w zależności od liczby linii
+    currentY = checkPageEnd(currentY); // Sprawdzanie, czy trzeba dodać stronę
+
+    // Tekst zgody po angielsku
+    const englishConsent = `
+I hereby consent to my personal data being processed by (company name) for the purpose of considering my application for the vacancy advertised under reference number (123XX6 etc.).
+`;
+
+    // Zwijanie tekstu na mniejsze linie (maxWidth = 180)
+    const englishConsentLines = doc.splitTextToSize(englishConsent, 180);
+    doc.text(englishConsentLines, 10, currentY);
+    currentY += englishConsentLines.length * 4; // Dostosowanie Y w zależności od liczby linii
+    currentY = checkPageEnd(currentY); // Sprawdzanie, czy trzeba dodać stronę
+
+    doc.save(`${generatedCV.name}_CV.pdf`);
+  };
 
   // steps
   const handleBack = () => {
@@ -286,7 +444,7 @@ export default function CVRoute() {
                   </div>
                 )}
                 {activeStep === 2 &&
-                  (!loaderData.userDBId ? (
+                  (loaderData.userDBId ? (
                     <div className="flex flex-col items-center w-full">
                       <Link
                         to="/sign-in"
@@ -296,15 +454,21 @@ export default function CVRoute() {
                       </Link>
                     </div>
                   ) : (
-                    <button className="btn btn-primary text-white self-end">
-                      <TfiDownload /> Download
+                    <button
+                      className="btn btn-primary text-white self-end"
+                      onClick={downloadCVAsPDF}
+                    >
+                      <TfiDownload /> Download as PDF
                     </button>
                   ))}
                 {generatedCV && (
                   <div className="text-left w-full mt-4 p-5 border border-gray-300 rounded-lg overflow-auto">
-                    <h2 className="text-3xl font-bold my-6 text-end">
+                    <h2 className="text-3xl font-bold mt-6 text-end">
                       {generatedCV.name}
                     </h2>
+                    <p className="mt-4 text-end text-slate-500">
+                      {generatedCV.occupation}
+                    </p>
                     <div className="mb-4 mt-10">
                       <h3 className="font-bold text-xl">
                         Contact Information:

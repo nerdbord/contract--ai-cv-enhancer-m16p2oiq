@@ -6,6 +6,7 @@ import crypto from "crypto";
 
 export const CVSchema = z.object({
   name: z.string(),
+  occupation: z.string(),
   contact: z.object({
     email: z.string().email(),
     phone: z.string(),
