@@ -86,6 +86,7 @@ export const action: ActionFunction = async ({ request }) => {
       cvData: enhancedCV,
       userId,
       message: "CV uploaded and processed successfully",
+      fileName: file.name,
       step: 2,
     };
   } catch (error) {
@@ -103,7 +104,7 @@ type CVData = {
     linkedin?: string;
   };
   languages: string[];
-  bio?: string;
+  summaryStatement?: string;
   skills: string[];
   technologies: string[];
   experience: {
@@ -117,6 +118,12 @@ type CVData = {
     institution: string;
     duration: string;
   }[];
+  projects: {
+    name: string;
+    description: string;
+    technologies: string[];
+    link: string;
+  }[];
 };
 
 export default function CVRoute() {
@@ -128,6 +135,7 @@ export default function CVRoute() {
     userId?: string;
     cvId?: string;
     step?: number;
+    fileName?: string;
   }>();
 
   const loaderData = useLoaderData<{
@@ -225,26 +233,34 @@ export default function CVRoute() {
                         name="userDBId"
                         value={loaderData.userDBId}
                       />
-                      <label
-                        htmlFor="file-upload"
-                        className="cursor-pointer flex flex-col items-center gap-2 border border-slate-300 rounded-lg w-[650px] h-[220px] p-6 bg-inherit resize-none flex-grow focus:outline-none focus:ring-0 focus:border-slate-300"
-                      >
-                        <UploadIcon />
-                        <p className="text-black text-center text-lg not-italic font-normal leading-7">
-                          Click the icon above or drop your resume in here!
-                        </p>
-                        <p className="text-center text-xs not-italic font-normal leading-4 text-slate-500">
-                          Resumes in PDF or DOCS. Readable text only (no scans).
-                          Max 2MB file size.
-                        </p>
-                        <input
-                          id="file-upload"
-                          type="file"
-                          name="file"
-                          className="hidden"
-                          required
-                        />
-                      </label>
+                      {actionData?.fileName ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="text-lg">
+                            File uploaded: {actionData.fileName}
+                          </p>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor="file-upload"
+                          className="cursor-pointer flex flex-col items-center gap-2 border border-slate-300 rounded-lg w-[650px] h-[220px] p-6 bg-inherit resize-none flex-grow focus:outline-none focus:ring-0 focus:border-slate-300"
+                        >
+                          <UploadIcon />
+                          <p className="text-black text-center text-lg not-italic font-normal leading-7">
+                            Click the icon above or drop your resume in here!
+                          </p>
+                          <p className="text-center text-xs not-italic font-normal leading-4 text-slate-500">
+                            Resumes in PDF or DOCS. Readable text only (no
+                            scans). Max 2MB file size.
+                          </p>
+                          <input
+                            id="file-upload"
+                            type="file"
+                            name="file"
+                            className="hidden"
+                            required
+                          />
+                        </label>
+                      )}
                       <input
                         type="hidden"
                         placeholder="Give your CV a name, e.g., 'original CV'"
@@ -286,11 +302,13 @@ export default function CVRoute() {
                   ))}
                 {generatedCV && (
                   <div className="text-left w-full mt-4 p-5 border border-gray-300 rounded-lg overflow-auto">
-                    <h2 className="text-2xl font-bold mb-4">
+                    <h2 className="text-3xl font-bold my-6 text-end">
                       {generatedCV.name}
                     </h2>
-                    <div className="mb-4">
-                      <h3 className="font-bold">Contact Information:</h3>
+                    <div className="mb-4 mt-10">
+                      <h3 className="font-bold text-xl">
+                        Contact Information:
+                      </h3>
                       <p>Email: {generatedCV.contact.email}</p>
                       <p>Phone: {generatedCV.contact.phone}</p>
                       {generatedCV.contact.portfolio && (
@@ -301,14 +319,16 @@ export default function CVRoute() {
                       )}
                     </div>
 
-                    {generatedCV.bio && (
+                    {generatedCV.summaryStatement && (
                       <div className="mb-4">
-                        <h3 className="font-bold">Bio:</h3>
-                        <p>{generatedCV.bio}</p>
+                        <h3 className="font-bold text-xl">
+                          Summary statement:
+                        </h3>
+                        <p>{generatedCV.summaryStatement}</p>
                       </div>
                     )}
                     <div className="mb-4">
-                      <h3 className="font-bold">Languages:</h3>
+                      <h3 className="font-bold text-xl">Languages:</h3>
                       <ul className="flex flex-wrap">
                         {generatedCV.languages.map(
                           (lang: string, index: number) => (
@@ -319,20 +339,9 @@ export default function CVRoute() {
                         )}
                       </ul>
                     </div>
+
                     <div className="mb-4">
-                      <h3 className="font-bold">Skills:</h3>
-                      <ul className="flex flex-wrap">
-                        {generatedCV.skills.map(
-                          (skill: string, index: number) => (
-                            <li className="mr-2" key={index}>
-                              {skill}
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    </div>
-                    <div className="mb-4">
-                      <h3 className="font-bold">Technologies:</h3>
+                      <h3 className="font-bold text-xl">Technologies:</h3>
                       <ul className="flex flex-wrap">
                         {generatedCV.technologies.map(
                           (tech: string, index: number) => (
@@ -344,7 +353,7 @@ export default function CVRoute() {
                       </ul>
                     </div>
                     <div className="mb-4">
-                      <h3 className="font-bold">Experience:</h3>
+                      <h3 className="font-bold text-xl">Experience:</h3>
                       {generatedCV.experience.map((exp: any, index: number) => (
                         <div key={index} className="mb-2">
                           <p className="font-bold">
@@ -356,7 +365,7 @@ export default function CVRoute() {
                       ))}
                     </div>
                     <div className="mb-4">
-                      <h3 className="font-bold">Education:</h3>
+                      <h3 className="font-bold text-xl">Education:</h3>
                       {generatedCV.education.map((edu: any, index: number) => (
                         <div key={index} className="mb-2">
                           <p className="font-bold">
@@ -365,6 +374,37 @@ export default function CVRoute() {
                           <p>Duration: {edu.duration}</p>
                         </div>
                       ))}
+                    </div>
+                    <div className="mb-4">
+                      <h3 className="font-bold text-xl">Projects:</h3>
+                      {generatedCV.projects.map(
+                        (project: any, index: number) => (
+                          <div key={index} className="mb-2">
+                            <p className="font-bold">
+                              {project.title} - {project.link}
+                            </p>
+                            <p> {project.description}</p>
+                            <p>technologies used - {project.technologies}</p>
+                          </div>
+                        )
+                      )}
+                    </div>
+                    <div className="flex flex-col items-start justify-center gap-2 text-sm text-slate-500 mt-6">
+                      <p>
+                        Wyrażam zgodę na przetwarzanie moich danych osobowych
+                        dla potrzeb niezbędnych do realizacji procesu rekrutacji
+                        zgodnie z Rozporządzeniem Parlamentu Europejskiego i
+                        Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. w sprawie
+                        ochrony osób fizycznych w związku z przetwarzaniem
+                        danych osobowych i w sprawie swobodnego przepływu takich
+                        danych oraz uchylenia dyrektywy 95/46/WE (RODO).
+                      </p>
+                      <p>
+                        I hereby consent to my personal data being processed by
+                        (company name) for the purpose of considering my
+                        application for the vacancy advertised under reference
+                        number (123XX6 etc.)
+                      </p>
                     </div>
                   </div>
                 )}

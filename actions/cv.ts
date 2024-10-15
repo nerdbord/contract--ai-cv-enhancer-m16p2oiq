@@ -13,8 +13,7 @@ export const CVSchema = z.object({
     linkedin: z.string().optional(),
   }),
   languages: z.array(z.string()),
-  bio: z.string().optional(),
-  skills: z.array(z.string()),
+  summaryStatement: z.string().optional(),
   technologies: z.array(z.string()),
   experience: z.array(
     z.object({
@@ -22,6 +21,7 @@ export const CVSchema = z.object({
       position: z.string(),
       duration: z.string(),
       description: z.string(),
+      duties: z.array(z.string()),
     })
   ),
   education: z.array(
@@ -29,6 +29,14 @@ export const CVSchema = z.object({
       institution: z.string(),
       degree: z.string(),
       duration: z.string(),
+    })
+  ),
+  projects: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      technologies: z.array(z.string()),
+      link: z.string(),
     })
   ),
 });
@@ -125,11 +133,10 @@ export async function enhanceCV(extractedCV: object) {
         ${extractedText}
         
         - Improve the structure, but do not add any fictional information.
-        - Add a professional bio if missing.
+        - Add a professional summary statement based on the content cv content but only if missing 
         - Ensure that the CV is ATS-friendly.
         - Organize sections (professional summary, skills, work experience, education, and CV clause).
         - Ensure each section has an appropriate heading and check for spelling errors.
-        - add interesting bio if missing 
         - if schema does not have section that exist in the CV- add them
       `,
     });
