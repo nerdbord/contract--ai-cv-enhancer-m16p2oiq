@@ -6,7 +6,7 @@ type Props = {
 
 export const Loader = ({ mainText, subText, subText2 }: Props) => {
   return (
-    <div className="flex flex-col items-center justify-center gap-6 pb-40">
+    <div className="flex flex-col  items-center justify-center gap-6 pb-40">
       <span className="loading loading-dots loading-lg text-indigo-900 "></span>
 
       <div>
@@ -19,3 +19,9 @@ export const Loader = ({ mainText, subText, subText2 }: Props) => {
     </div>
   );
 };
+
+<Loader
+  mainText="Uploading your CV..."
+  subText="We  are uploading your CV."
+  subText2="This will take only moment!"
+/>;

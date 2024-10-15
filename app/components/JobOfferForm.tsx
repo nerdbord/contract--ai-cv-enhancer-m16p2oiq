@@ -28,7 +28,7 @@ export const JobOfferForm = forwardRef<
     </p>
     <textarea
       name="jobDescription"
-      className="gap-6 border border-slate-300 rounded-lg w-[650px] h-[188px] p-6 cursor-pointer bg-inherit resize-none flex-grow focus:outline-none focus:ring-0 focus:border-slate-300"
+      className="gap-6 border border-slate-300 rounded-lg w-[650px] h-[220px] p-6 cursor-pointer bg-inherit resize-none flex-grow focus:outline-none focus:ring-0 focus:border-slate-300"
       placeholder="e.g. https://theprotocol.it/filtry/backend;sp/praca/junior-php-developer or leave it empty if you want only to enhance your resume"
       defaultValue={actionData?.jobDescription || ""}
       onChange={onChange}

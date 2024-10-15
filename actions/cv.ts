@@ -130,10 +130,11 @@ export async function enhanceCV(extractedCV: object) {
         - Organize sections (professional summary, skills, work experience, education, and CV clause).
         - Ensure each section has an appropriate heading and check for spelling errors.
         - add interesting bio if missing 
+        - if schema does not have section that exist in the CV- add them
       `,
     });
 
-    console.log(result.object);
+    //console.log(result.object);
     return result.object;
   } catch (error) {
     console.error("Error during enhancement of CV:", error);
