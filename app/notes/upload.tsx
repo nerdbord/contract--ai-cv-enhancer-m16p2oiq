@@ -11,7 +11,7 @@ import { LoaderFunction, ActionFunction, json } from "@remix-run/node";
 import { createUserFromClerk } from "actions/user";
 import { getAuth } from "@clerk/remix/ssr.server";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { saveOriginalCV, cvToJSON } from "actions/cv";
+//import { saveOriginalCV, cvToJSON } from "actions/cv";
 
 export const loader: LoaderFunction = async (args) => {
   const { userId } = await getAuth(args); // Correctly pass entire args to getAuth
@@ -152,7 +152,7 @@ export default function UploadPage() {
             <UploadCV onFileUpload={handleFileSelect} file={uploadedFile} />
           )}
 
-          {activeStep === 2 && <EnhancedCV />}
+          {/*    {activeStep === 2 && <EnhancedCV />} */}
           {error && (
             <div className="flex justify-center items-center gap-2 text-red-700 bg-red-100 border border-red-700 w-full text-center py-2 mt-2 rounded-xl text-sm">
               <AiOutlineExclamationCircle className="text-red-700 h-6 w-6" />

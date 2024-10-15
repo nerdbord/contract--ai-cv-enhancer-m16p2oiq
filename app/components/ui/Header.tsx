@@ -14,7 +14,7 @@ export const Header = () => {
       </Link>
       <div className="flex gap-6 ">
         <div className="flex gap-8 items-center">
-          {pathname === "/upload" && (
+          {pathname === "/cv" && (
             <Link
               to="/dashboard"
               className="btn btn-ghost text-normal font-light"
@@ -32,8 +32,8 @@ export const Header = () => {
             <UserButton />
           </SignedIn>
 
-          {pathname !== "/upload" && (
-            <Link to="/upload" className="btn btn-primary text-white">
+          {pathname !== "/cv" && (
+            <Link to="/cv" className="btn btn-primary text-white">
               Get Started
             </Link>
           )}

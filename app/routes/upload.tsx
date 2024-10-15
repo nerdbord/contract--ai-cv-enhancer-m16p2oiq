@@ -1,203 +1,144 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from "react";
-import { Stepper } from "../components/ui/Stepper";
-import { JobOfferForm } from "../components/JobOfferForm";
-import { GoArrowLeft, GoArrowRight } from "react-icons/go";
-import { Link, useLoaderData, useActionData, Form } from "@remix-run/react";
-import { EnhancedCV } from "../components/EnhancedCV";
-import { Loader } from "../components/ui/Loader";
-import { UploadCV } from "../components/UploadCV";
-import {
-  LoaderFunction,
-  ActionFunction,
-  json,
-  redirect,
-} from "@remix-run/node";
-import { createUserFromClerk } from "actions/user";
+import { LoaderFunction, redirect, ActionFunction } from "@remix-run/node";
 import { getAuth } from "@clerk/remix/ssr.server";
-import { AiOutlineExclamationCircle } from "react-icons/ai";
-import { saveOriginalCV, cvToJSON } from "actions/cv";
-import { Buffer } from "buffer";
+import { useActionData, useLoaderData } from "@remix-run/react";
+import { saveCV, cvToJSON, getUserCV } from "actions/cv";
+import { getUserByClerkId } from "actions/user";
+import { prisma } from "lib/prisma";
+import crypto from "crypto";
+import { useState } from "react";
 
 export const loader: LoaderFunction = async (args) => {
-  const { userId } = await getAuth(args); // Correctly pass entire args to getAuth
-  if (!userId) {
-    return null;
+  const { userId } = await getAuth(args);
+  if (!userId) return redirect("/sign-in");
+
+  const user = await getUserByClerkId(userId);
+  const userDBId = user?.id;
+  if (!userDBId) return redirect("/sign-in");
+
+  try {
+    const userCV = await getUserCV(userDBId);
+    if (!userCV) {
+      return { userDBId, userCV: null };
+    }
+    return { userDBId, userCV };
+  } catch (error) {
+    return { userDBId, error: (error as Error).message };
   }
-  let user;
-  if (userId) {
-    user = await createUserFromClerk(userId);
-  }
-  return json({ userDBId: user?.id });
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const step = formData.get("step");
+  const file = formData.get("file") as File | null;
+  const name = formData.get("textInput") as string;
+  const userId = formData.get("userDBId") as string;
 
-  if (step === "jobOffer") {
-    const jobDescription = formData.get("jobDescription") as string;
-    console.log(
-      jobDescription ? "Job offer received" : "No job offer provided"
-    );
-    console.log("Job Offer: ", jobDescription);
-    console.log("Form Data: ", formData); // Console log the job offer after it's added
-    // Job description is no longer required
-    return json({ jobDescription: jobDescription ?? "" });
+  function computeFileHash(buffer: Buffer): string {
+    const hash = crypto.createHash("sha256");
+    hash.update(buffer);
+    return hash.digest("hex");
   }
 
-  if (step === "uploadCV") {
-    const uploadedFile = formData.get("cvFile") as File;
-    const jobDescription = formData.get("jobDescription") as string; // Get the job offer for logging
-    if (!uploadedFile) {
-      return json({ error: "CV file is required" }, { status: 400 });
-    }
-    try {
-      const text = await uploadedFile.text();
-      const jsonResult = await cvToJSON(Buffer.from(text));
-      console.log("Job Offer: ", jobDescription); // Console log the job offer after CV is uploaded
-      console.log("CV Data: ", jsonResult);
-      console.log("Form Data: ", formData); // Console log the CV data after CV is uploaded
-      return json({ cvData: jsonResult });
-    } catch (err) {
-      console.error("Error processing CV:", err);
-      return json({ error: "Error processing CV content" }, { status: 500 });
-    }
+  if (!file) {
+    return { message: "No file uploaded" };
   }
 
-  return json({ error: "Invalid action" }, { status: 400 });
+  if (!userId) {
+    return { message: "User ID is missing." };
+  }
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const cvHash = computeFileHash(buffer);
+    const existingCV = await prisma.cV.findUnique({
+      where: {
+        cvHash,
+      },
+    });
+
+    if (existingCV) {
+      return {
+        message: `The file ${file.name} has already been uploaded.`,
+        cvId: existingCV.id,
+      };
+    }
+
+    const extractedCV = await cvToJSON(buffer);
+
+    const savedCV = await saveCV({
+      fileBuffer: buffer,
+      userId,
+      name,
+      fileName: file.name,
+      mimeType: file.type,
+      extractedCV: extractedCV,
+    });
+
+    return redirect(`/cv`);
+  } catch (error) {
+    return { message: `Failed to upload file`, error };
+  }
 };
 
-const steps = [
-  { label: "Job description" },
-  { label: "Upload resume" },
-  { label: "Suggestions" },
-];
-
-export default function UploadPage() {
+export default function DashboardRoute() {
   const actionData = useActionData<{
-    error?: string;
-    jobDescription?: string;
-    cvData?: unknown;
+    message: string;
+    structuredData?: Record<string, unknown>;
   }>();
+  const loaderData = useLoaderData<{
+    userDBId: string;
+    userCV?: object | null;
+    error?: string;
+  }>();
+
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeStep, setActiveStep] = useState(0);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  // steps
-  const handleBack = () => {
-    setActiveStep((prev) => Math.max(prev - 1, 0));
-  };
-
-  const handleForward = () => {
-    setActiveStep((prev) => prev + 1);
-  };
-
-  const getButtonText = () => {
-    switch (activeStep) {
-      case 0:
-        return "Go to Upload resume";
-      case 1:
-        return "Go to Suggestions";
-      default:
-        return "Next";
-    }
-  };
-
-  const renderStep = () => {
-    switch (activeStep) {
-      case 0:
-        return (
-          <div>
-            <input type="hidden" name="step" value="jobOffer" />
-            <JobOfferForm
-              onChange={(e) => setError(null)}
-              actionData={{
-                jobDescription: actionData?.jobDescription ?? "",
-              }}
-              errorMessage={actionData?.error}
-            />
-            <div className="flex justify-between w-full items-center mt-4">
-              <Link to="/" className="btn btn-outline flex items-center gap-2">
-                <GoArrowLeft className="h-5 w-5" />
-                Back
-              </Link>
-              <button
-                type="button"
-                onClick={handleForward}
-                className="btn btn-primary text-white flex items-center gap-2"
-              >
-                {getButtonText()}
-                <GoArrowRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        );
-      case 1:
-        return isLoading ? (
-          <Loader
-            mainText="We're working on your CV..."
-            subText="Your document is being enhanced."
-            subText2="This will only take a moment!"
-          />
-        ) : (
-          <div className="w-full">
-            <UploadCV
-              onFileUpload={(file) => setUploadedFile(file)}
-              file={uploadedFile}
-              errorMessage={actionData?.error}
-            />
-            {!error && (
-              <div className="text-red-500 mt-2 flex items-center gap-2">
-                <AiOutlineExclamationCircle className="h-5 w-5" />
-                {error}
-              </div>
-            )}
-            <div className="flex justify-between w-full items-center mt-4">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="btn btn-outline flex items-center gap-2"
-              >
-                <GoArrowLeft className="h-5 w-5" />
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (activeStep === 1 && !uploadedFile) {
-                    setError("CV file is required to proceed.");
-                  } else {
-                    handleForward();
-                  }
-                }}
-                className="btn btn-primary text-white flex items-center gap-2"
-              >
-                {getButtonText()}
-                <GoArrowRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        );
-      case 2:
-        return <EnhancedCV cvData={actionData?.cvData} />;
-      default:
-        return null;
-    }
+  const handleSubmit = () => {
+    setIsLoading(true);
   };
 
   return (
-    <div className="flex items-start justify-between flex-col w-full h-full min-h-[calc(100vh-328px)]">
-      <div className="flex gap-9 flex-col flex-grow w-full items-center bg-white pt-9 ">
-        <Stepper activeStep={activeStep} steps={steps} />
-        <div className="flex flex-col items-center justify-end flex-grow w-[650px] pb-4 h-full">
-          {renderStep()}
-          {!isLoading && activeStep !== 2 && activeStep > 0 && (
-            <div className="flex justify-between w-full items-center gap-6 py-4"></div>
-          )}
+    <main className="flex flex-col h-screen items-center justify-start gap-16 p-4">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <form
+        className="flex flex-col gap-4"
+        method="post"
+        encType="multipart/form-data"
+        onSubmit={handleSubmit}
+      >
+        {/* the hidden input field to pass the userDBId to the action */}
+        <input type="hidden" name="userDBId" value={loaderData.userDBId} />
+        <input type="file" name="file" required />
+
+        <input
+          type="hidden"
+          id="textInput"
+          name="textInput"
+          placeholder="Give your CV a name, e.g., 'original CV'"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          type="submit"
+          className="mt-4 p-2 bg-blue-500 text-white rounded"
+          disabled={isLoading}
+        >
+          {isLoading ? "Uploading..." : "Upload File"}
+        </button>
+      </form>
+
+      {actionData && (
+        <div className="mt-4 text-green-500">
+          <p>{actionData.message}</p>
         </div>
-      </div>
-    </div>
+      )}
+
+      {loaderData.error && (
+        <div className="mt-4 text-red-500">
+          <p>{loaderData.error}</p>
+        </div>
+      )}
+    </main>
   );
 }

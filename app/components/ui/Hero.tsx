@@ -40,7 +40,7 @@ export const Hero = () => {
             resume containing all the right keywords, improve your writing &
             highlight your strengths.
           </p>
-          <Link to="/upload" className="btn btn-primary text-white">
+          <Link to="/cv" className="btn btn-primary text-white">
             Enhance My Resume
           </Link>
           <p className="text-base text-indigo-200 not-italic font-normal leading-6">
@@ -63,9 +63,9 @@ export const Hero = () => {
           Discover the Benefits
         </h2>
         <div className="flex justify-center">
-          <div className="flex flex-wrap gap-5 justify-center">
+          <div className="flex  gap-5 justify-center w-4/5">
             {benefitsData.map((benefit, index) => (
-              <div key={index} className="text-start flex gap-2 p-2 w-[320px]">
+              <div key={index} className="text-start flex gap-2 p-2 w-2/3">
                 <div className="w-1/4">
                   <div className="w-10 h-10 rounded-full bg-teal-400 text-black flex items-center justify-center mx-auto mb-4 text-2xl not-italic font-normal leading-10 text-base-neutral ">
                     {benefit.icon}

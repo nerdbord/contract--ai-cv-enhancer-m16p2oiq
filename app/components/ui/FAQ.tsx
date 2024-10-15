@@ -59,7 +59,7 @@ export const FAQ = () => {
           If you have any questions about our Enhancer AI, read on to get
           answers to some of our most frequently asked questions.
         </p>
-        <Link to="/upload" className="btn btn-primary text-white mt-6">
+        <Link to="/cv" className="btn btn-primary text-white mt-6">
           Enhance My Resume
         </Link>
       </div>
@@ -69,7 +69,7 @@ export const FAQ = () => {
         {faqItems.map((item, index) => (
           <Collapse key={index} title={item.title} content={item.content} />
         ))}
-        <Link to="/upload" className="btn btn-primary text-white mt-6">
+        <Link to="/cv" className="btn btn-primary text-white mt-6">
           Enhance My Resume
         </Link>
       </div>

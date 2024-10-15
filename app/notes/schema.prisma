@@ -34,4 +34,16 @@ model CV {
   user        User      @relation(fields: [userId], references: [id])
 }
 
-
+//model originalCV {
+// id        Int       @id @default(sequence())
+// constantName String
+//  name      String   
+//  fileName  String  
+//  cv        Bytes     
+//  mimeType  String   
+//  cvHash      String   @unique
+//  extractedCV  Json  
+//  createdAt DateTime  @default(now())
+//  userId    String    
+//  user      User      @relation(fields: [userId], references: [id])
+// }

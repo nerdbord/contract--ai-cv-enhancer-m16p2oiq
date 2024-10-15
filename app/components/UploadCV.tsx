@@ -8,6 +8,7 @@ interface UploadCVProps {
   onFileUpload: (file: File | null) => void;
   errorMessage?: string;
   file: File | null;
+  name: string;
 }
 
 export const UploadCV: React.FC<UploadCVProps> = ({
@@ -67,7 +68,7 @@ export const UploadCV: React.FC<UploadCVProps> = ({
   };
 
   return (
-    <div className="upload-cv-container w-full">
+    <form className="upload-cv-container w-full">
       {!file && (
         <h1 className="text-center text-5xl not-italic font-normal pb-8">
           Upload your resume
@@ -141,10 +142,10 @@ export const UploadCV: React.FC<UploadCVProps> = ({
           />
         </div>
       )}
-      {fileError && <p className="text-red-500 text-sm mt-2">{fileError}</p>}
+      {/*  {fileError && <p className="text-red-500 text-sm mt-2">{fileError}</p>}
       {errorMessage && (
         <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
-      )}
-    </div>
+      )} */}
+    </form>
   );
 };

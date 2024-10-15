@@ -1,49 +1,30 @@
-import { clerk } from "../lib/clerk";
-import { prisma } from "../lib/prisma";
+import { clerk } from "lib/clerk";
+import { prisma } from "lib/prisma";
 
 export async function createUserFromClerk(clerkUserId: string) {
-  try {
-    // Fetch user data from Clerk
-    const clerkUser = await clerk.users.getUser(clerkUserId);
+  const clerkUser = await clerk.users.getUser(clerkUserId);
+  const email = clerkUser.emailAddresses?.[0]?.emailAddress || "";
+  const name =
+    clerkUser.firstName && clerkUser.lastName
+      ? `${clerkUser.firstName} ${clerkUser.lastName}`
+      : clerkUser.firstName || clerkUser.lastName || "No name provided";
 
-    if (!clerkUser) {
-      console.error(`No Clerk user found with ID: ${clerkUserId}`);
-      throw new Error("Clerk user not found.");
-    }
+  const user = await prisma.user.upsert({
+    where: { clerkId: clerkUserId },
+    update: {
+      name,
+    },
+    create: {
+      email,
+      clerkId: clerkUserId,
+      name,
+    },
+  });
 
-    const email = clerkUser.emailAddresses?.[0]?.emailAddress || "";
-    const firstName = clerkUser.firstName || "";
-    const lastName = clerkUser.lastName || "";
-    const name =
-      firstName && lastName
-        ? `${firstName} ${lastName}`
-        : firstName || lastName || "No name provided";
-
-    if (!email) {
-      throw new Error("No email address available for this Clerk user.");
-    }
-
-    const user = await prisma.user.upsert({
-      where: { clerkId: clerkUserId },
-      update: {
-        name,
-        email,
-      },
-      create: {
-        email,
-        clerkId: clerkUserId,
-        name,
-      },
-    });
-
-    //console.log("User successfully created or updated from Clerk:", user);
-    return user;
-  } catch (error) {
-    console.error("Error creating/updating user from Clerk:", error);
-    throw new Error("Unable to create or update user.");
-  }
+  //console.log("User created or updated from Clerk:", user);
+  return user;
 }
-/* 
+
 export async function getUserByClerkId(clerkUserId: string) {
   const user = await prisma.user.findUnique({
     where: { clerkId: clerkUserId },
@@ -57,4 +38,3 @@ export async function getUserByClerkId(clerkUserId: string) {
   //console.log("User found:", user);
   return user;
 }
- */
