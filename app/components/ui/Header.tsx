@@ -13,7 +13,7 @@ export const Header = () => {
         <Logo />
       </Link>
       <div className="flex gap-6 ">
-        <div className="flex gap-8 items-center">
+        <div className="flex gap-4 items-center">
           {pathname === "/cv" && (
             <Link
               to="/dashboard"

@@ -348,7 +348,7 @@ I hereby consent to my personal data being processed by (company name) for the p
       <div className="flex items-start justify-between flex-col w-full h-full min-h-[calc(100vh-328px)]">
         <div className="flex gap-9 flex-col flex-grow w-full items-center bg-white pt-9 ">
           <Stepper activeStep={activeStep} steps={steps} />
-          <div className="flex flex-col items-center justify-end flex-grow w-[650px] pb-4 py-4 h-full ">
+          <div className="flex flex-col items-center justify-center flex-grow w-[650px] pb-4 py-4 h-full ">
             {isLoading ? (
               <div className="flex py-12 items-center justify-center">
                 <Loader
@@ -380,11 +380,11 @@ I hereby consent to my personal data being processed by (company name) for the p
                 {activeStep === 1 && (
                   <div className="flex flex-col items-center w-full">
                     <h1 className="text-center text-5xl not-italic font-normal pb-9">
-                      Add your job description
+                      Upload your resume
                     </h1>
                     <p className="text-base text-start not-italic font-normal leading-6 pb-9">
-                      Paste link to a job offer or the job description you want
-                      to compare your resume to.
+                      Upload your Resume, click on &quot;Get an Enhanced
+                      Resume&quot; and let the magic happen!
                     </p>
                     <form
                       className="flex flex-col gap-4 w-full"
